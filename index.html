@@ -12,6 +12,7 @@
             background-color: black;
             color: rgba(255,255,255,0.9);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -20,6 +21,7 @@
             text-align: center;
             line-height: 1.6;
             letter-spacing: 0.5px;
+            overflow: hidden;
         }
         #game {
             max-width: 80%;
@@ -35,10 +37,31 @@
             font-size: 16px;
             color: rgba(255,255,255,0.6);
         }
+        #controls {
+            margin-top: 20px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .glow {
+            text-shadow: 0 0 15px rgba(255,255,255,0.7);
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 30px rgba(100,200,255,0.5); }
+        }
     </style>
 </head>
 <body>
-    <div id="game"></div>
+    <div id="game" class="fade-in"></div>
+    <div id="controls"></div>
     <div id="status"></div>
     <script>
         const createGameScenes = (game) => ({
@@ -57,16 +80,35 @@
             },
             shadow_realm: {
                 text: "Obsidian landscapes stretch beyond comprehension.",
-                description: "Ethereal beings drift at the edge of perception. (E)nter the realm, (B)ack to the void.",
+                description: "Ethereal beings drift at the edge of perception. (E)nter the realm, (B)ack to the void, (O)bserve the beings.",
                 options: {
                     E: 'shadow_throne',
-                    B: 'start'
+                    B: 'start',
+                    O: 'shadow_beings'
                 },
                 challenge: {
                     type: 'wisdom',
                     difficulty: 3,
                     success: 'memory_fragment',
                     failure: 'shadow_realm_trap'
+                }
+            },
+            shadow_beings: {
+                text: "The ethereal beings notice your presence and approach.",
+                description: "Their forms shimmer with ancient knowledge. (C)ommunicate with them, (B)ack away.",
+                options: {
+                    C: 'shadow_communion',
+                    B: 'shadow_realm'
+                }
+            },
+            shadow_communion: {
+                text: "Their thoughts touch yours, vast and incomprehensible.",
+                description: "You gain fleeting insights into existence beyond the void. (R)eturn to shadow realm.",
+                options: {
+                    R: 'shadow_realm'
+                },
+                onVisit: function() {
+                    game.increaseInsight(1);
                 }
             },
             shadow_realm_trap: {
@@ -79,16 +121,35 @@
             },
             shadow_throne: {
                 text: "A throne of fractured memories materializes.",
-                description: "Ancient whispers pulse from the obsidian seat. Requires Wisdom. (S)it on the throne, (B)ack away.",
+                description: "Ancient whispers pulse from the obsidian seat. Requires Wisdom. (S)it on the throne, (B)ack away, (T)ouch the armrest cautiously.",
                 options: {
                     S: 'memory_fragment',
-                    B: 'shadow_realm'
+                    B: 'shadow_realm',
+                    T: 'throne_whispers'
                 },
                 challenge: {
                     type: 'wisdom',
                     difficulty: 5,
                     success: 'memory_fragment',
                     failure: 'throne_madness'
+                }
+            },
+            throne_whispers: {
+                text: "The throne speaks directly to your mind.",
+                description: "Fragments of ancient wisdom filter through the chaos. (L)isten more intently, (B)ack away.",
+                options: {
+                    L: 'throne_wisdom',
+                    B: 'shadow_throne'
+                }
+            },
+            throne_wisdom: {
+                text: "Knowledge of forgotten realms seeps into your consciousness.",
+                description: "You feel more attuned to the void. (R)eturn to the throne.",
+                options: {
+                    R: 'shadow_throne'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
                 }
             },
             throne_madness: {
@@ -101,27 +162,65 @@
             },
             memory_fragment: {
                 text: "Visions of countless lives flood your consciousness.",
-                description: "Your insight grows. (R)eturn to void, (C)ontinue exploring.",
+                description: "Your insight grows. (R)eturn to void, (C)ontinue exploring, (M)editate on the visions.",
                 options: {
                     R: 'start',
-                    C: 'forgotten_prophecy'
+                    C: 'forgotten_prophecy',
+                    M: 'memory_meditation'
                 },
                 onVisit: function() {
                     game.increaseInsight(2);
                 }
             },
+            memory_meditation: {
+                text: "You focus on a specific memory stream.",
+                description: "A civilization of light beings who transcended physical form. (D)elve deeper, (R)eturn to the fragments.",
+                options: {
+                    D: 'memory_revelation',
+                    R: 'memory_fragment'
+                }
+            },
+            memory_revelation: {
+                text: "The light beings' ascension ritual reveals itself fully.",
+                description: "You understand a fragment of transcendence. (R)eturn with this knowledge.",
+                options: {
+                    R: 'memory_fragment'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
             forgotten_prophecy: {
                 text: "Words etched in starlight reveal ancient truths.",
-                description: "The prophecy speaks of a convergence. Requires deep Insight. (R)eturn to void, (U)nderstand more.",
+                description: "The prophecy speaks of a convergence. Requires deep Insight. (R)eturn to void, (U)nderstand more, (D)ecipher symbols.",
                 options: {
                     R: 'start',
-                    U: 'prophecy_revelation'
+                    U: 'prophecy_revelation',
+                    D: 'prophecy_symbols'
                 },
                 challenge: {
                     type: 'insight',
                     difficulty: 7,
                     success: 'prophecy_revelation',
                     failure: 'prophecy_confusion'
+                }
+            },
+            prophecy_symbols: {
+                text: "The symbols shift and transform as you observe them.",
+                description: "Patterns emerge in their dance. (C)ontemplate the patterns, (R)eturn to the prophecy.",
+                options: {
+                    C: 'prophecy_patterns',
+                    R: 'forgotten_prophecy'
+                }
+            },
+            prophecy_patterns: {
+                text: "The patterns form a map of the multiverse.",
+                description: "You see connections between all paths. (R)eturn with this understanding.",
+                options: {
+                    R: 'forgotten_prophecy'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
                 }
             },
             prophecy_confusion: {
@@ -134,21 +233,33 @@
             },
             prophecy_revelation: {
                 text: "You are the bridge between shattered realities.",
-                description: "(R)eturn to void, (C)ontinue the journey.",
+                description: "(R)eturn to void, (C)ontinue the journey, (M)editate on your role.",
                 options: {
                     R: 'start',
-                    C: 'echo_caverns'
+                    C: 'echo_caverns',
+                    M: 'bridge_meditation'
                 },
                 onVisit: function() {
                     game.increaseInsight(3);
                 }
             },
+            bridge_meditation: {
+                text: "You see infinite versions of yourself across the multiverse.",
+                description: "All connected, all part of the cosmic tapestry. (R)eturn from meditation.",
+                options: {
+                    R: 'prophecy_revelation'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
+                }
+            },
             echo_caverns: {
                 text: "Crystalline caverns resonate with forgotten songs.",
-                description: "Echoes of lost civilizations pulse around you. (D)escend deeper, (B)ack to void.",
+                description: "Echoes of lost civilizations pulse around you. (D)escend deeper, (B)ack to void, (L)isten to echoes.",
                 options: {
                     D: 'crystal_heart',
-                    B: 'start'
+                    B: 'start',
+                    L: 'cavern_song'
                 },
                 challenge: {
                     type: 'wisdom',
@@ -157,20 +268,50 @@
                     failure: 'cavern_illusion'
                 }
             },
+            cavern_song: {
+                text: "The echoes form a haunting melody of creation and destruction.",
+                description: "Each note tells the story of a universe. (H)um with the melody, (R)eturn to caverns.",
+                options: {
+                    H: 'song_harmony',
+                    R: 'echo_caverns'
+                }
+            },
+            song_harmony: {
+                text: "As you join the cosmic melody, the crystals resonate with you.",
+                description: "The harmony reveals pathways through reality. (R)eturn to the caverns.",
+                options: {
+                    R: 'echo_caverns'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
+                }
+            },
             cavern_illusion: {
                 text: "The cavern paths twist into impossible geometries.",
-                description: "(R)eturn to void, (T)ry again.",
+                description: "(R)eturn to void, (T)ry again, (E)xplore the impossibility.",
                 options: {
                     R: 'start',
-                    T: 'echo_caverns'
+                    T: 'echo_caverns',
+                    E: 'geometric_insight'
+                }
+            },
+            geometric_insight: {
+                text: "You surrender to the impossible geometry.",
+                description: "As you accept the paradox, you perceive pathways beyond conventional space. (R)eturn to caverns.",
+                options: {
+                    R: 'echo_caverns'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
                 }
             },
             crystal_heart: {
                 text: "A living crystal pulses with primordial energy.",
-                description: "Ancient rhythms call to you. Requires high Insight. (T)ouch the crystal, (B)ack away.",
+                description: "Ancient rhythms call to you. Requires high Insight. (T)ouch the crystal, (B)ack away, (O)bserve patterns.",
                 options: {
                     T: 'crystal_communion',
-                    B: 'echo_caverns'
+                    B: 'echo_caverns',
+                    O: 'crystal_patterns'
                 },
                 challenge: {
                     type: 'insight',
@@ -179,31 +320,72 @@
                     failure: 'crystal_rejection'
                 }
             },
+            crystal_patterns: {
+                text: "The crystal's inner light forms shifting mathematical patterns.",
+                description: "Equations of existence reveal themselves. (S)tudy the equations, (R)eturn to crystal.",
+                options: {
+                    S: 'crystal_equations',
+                    R: 'crystal_heart'
+                }
+            },
+            crystal_equations: {
+                text: "The equations show how reality can be reshaped through pure will.",
+                description: "You grasp fragments of cosmic power. (R)eturn to the crystal heart.",
+                options: {
+                    R: 'crystal_heart'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
             crystal_rejection: {
                 text: "The crystal repels your consciousness.",
-                description: "(R)eturn to void, (T)ry again.",
+                description: "(R)eturn to void, (T)ry again, (M)editate to center yourself.",
                 options: {
                     R: 'start',
-                    T: 'crystal_heart'
+                    T: 'crystal_heart',
+                    M: 'crystal_meditation'
+                }
+            },
+            crystal_meditation: {
+                text: "You align your consciousness with the crystal's frequency.",
+                description: "The connection grows stronger. (R)eturn to the crystal.",
+                options: {
+                    R: 'crystal_heart'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
                 }
             },
             crystal_communion: {
                 text: "Cosmic knowledge floods your essence.",
-                description: "(R)eturn to void, (C)ontinue listening.",
+                description: "(R)eturn to void, (C)ontinue listening, (M)erge deeper with crystal.",
                 options: {
                     R: 'start',
-                    C: 'spectral_mists'
+                    C: 'spectral_mists',
+                    M: 'crystal_merge'
                 },
                 onVisit: function() {
                     game.increaseInsight(4);
                 }
             },
+            crystal_merge: {
+                text: "Your consciousness temporarily merges with the crystal entity.",
+                description: "You perceive existence from its ancient perspective. (R)eturn to your form.",
+                options: {
+                    R: 'crystal_communion'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
             spectral_mists: {
                 text: "Phantasmal landscapes shift and breathe.",
-                description: "Silhouettes of lost souls drift nearby. (P)enetrate the mists, (B)ack to void.",
+                description: "Silhouettes of lost souls drift nearby. (P)enetrate the mists, (B)ack to void, (C)all to the souls.",
                 options: {
                     P: 'soul_archive',
-                    B: 'start'
+                    B: 'start',
+                    C: 'soul_contact'
                 },
                 challenge: {
                     type: 'wisdom',
@@ -212,20 +394,69 @@
                     failure: 'mist_trap'
                 }
             },
+            soul_contact: {
+                text: "Several spectral entities approach, curious about your presence.",
+                description: "Their forms shift between different states of being. (C)ommunicate with them, (O)bserve silently, (B)ack away.",
+                options: {
+                    C: 'soul_communication',
+                    O: 'soul_observation',
+                    B: 'spectral_mists'
+                }
+            },
+            soul_communication: {
+                text: "Your consciousness reaches out to the spectral entities.",
+                description: "They share fragments of existence beyond physical form. (A)sk about transcendence, (R)eturn to mists.",
+                options: {
+                    A: 'soul_wisdom',
+                    R: 'spectral_mists'
+                }
+            },
+            soul_wisdom: {
+                text: "They reveal that transcendence requires unity of all aspects of self.",
+                description: "You gain profound insight into the nature of consciousness. (R)eturn to the spectral mists.",
+                options: {
+                    R: 'spectral_mists'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
+            soul_observation: {
+                text: "You observe the souls' intricate dance through different planes.",
+                description: "Their movements reveal patterns of cosmic significance. (R)eturn to spectral mists.",
+                options: {
+                    R: 'spectral_mists'
+                },
+                onVisit: function() {
+                    game.increaseInsight(1);
+                }
+            },
             mist_trap: {
                 text: "The spectral mists begin to consume your essence.",
-                description: "(R)eturn to void, (T)ry again.",
+                description: "(R)eturn to void, (T)ry again, (F)ocus your will to resist.",
                 options: {
                     R: 'start',
-                    T: 'spectral_mists'
+                    T: 'spectral_mists',
+                    F: 'mist_resistance'
+                }
+            },
+            mist_resistance: {
+                text: "You focus your consciousness and push back against the mists.",
+                description: "The experience strengthens your resolve. (R)eturn to spectral mists.",
+                options: {
+                    R: 'spectral_mists'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
                 }
             },
             soul_archive: {
                 text: "An infinite library of forgotten existences.",
-                description: "Untold stories swirl around you. Requires high Insight. (R)ead a fragment, (B)ack to mists.",
+                description: "Untold stories swirl around you. Requires high Insight. (R)ead a fragment, (B)ack to mists, (S)earch for specific knowledge.",
                 options: {
                     R: 'soul_fragment',
-                    B: 'spectral_mists'
+                    B: 'spectral_mists',
+                    S: 'soul_search'
                 },
                 challenge: {
                     type: 'insight',
@@ -234,42 +465,94 @@
                     failure: 'archive_rejection'
                 }
             },
-            archive_rejection: {
-                text: "The archive's knowledge slips through your grasp.",
-                description: "(R)eturn to void, (T)ry again.",
+            soul_search: {
+                text: "You focus on finding knowledge of the nexus points between realities.",
+                description: "The archive responds to your intent. (E)xplore findings, (R)eturn to archive.",
                 options: {
-                    R: 'start',
-                    T: 'soul_archive'
+                    E: 'nexus_knowledge',
+                    R: 'soul_archive'
                 }
             },
-            soul_fragment: {
-                text: "A single life's essence unfolds before you.",
-                description: "(C)ontinue reading, (R)eturn to void.",
+            nexus_knowledge: {
+                text: "You discover ancient maps of reality convergence points.",
+                description: "This knowledge will help navigate the temporal breach. (R)eturn to the archive.",
                 options: {
-                    C: 'deeper_fragment',
-                    R: 'start'
-                },
-                onVisit: function() {
-                    game.increaseInsight(2);
-                }
-            },
-            deeper_fragment: {
-                text: "The boundary between observer and observed dissolves.",
-                description: "(R)eturn to void, (C)ontinue transcending.",
-                options: {
-                    R: 'start',
-                    C: 'temporal_breach'
+                    R: 'soul_archive'
                 },
                 onVisit: function() {
                     game.increaseInsight(3);
                 }
             },
+            archive_rejection: {
+                text: "The archive's knowledge slips through your grasp.",
+                description: "(R)eturn to void, (T)ry again, (M)editate to improve your perception.",
+                options: {
+                    R: 'start',
+                    T: 'soul_archive',
+                    M: 'archive_meditation'
+                }
+            },
+            archive_meditation: {
+                text: "You quiet your thoughts and attune to the archive's frequency.",
+                description: "Your mind expands to better receive the knowledge. (R)eturn to the archive.",
+                options: {
+                    R: 'soul_archive'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
+                }
+            },
+            soul_fragment: {
+                text: "A single life's essence unfolds before you.",
+                description: "(C)ontinue reading, (R)eturn to void, (D)ive deeper into the memory.",
+                options: {
+                    C: 'deeper_fragment',
+                    R: 'start',
+                    D: 'memory_immersion'
+                },
+                onVisit: function() {
+                    game.increaseInsight(2);
+                }
+            },
+            memory_immersion: {
+                text: "You temporarily experience existence through another's perspective.",
+                description: "A being who discovered how to traverse between dimensions. (R)eturn to soul fragment.",
+                options: {
+                    R: 'soul_fragment'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
+            deeper_fragment: {
+                text: "The boundary between observer and observed dissolves.",
+                description: "(R)eturn to void, (C)ontinue transcending, (S)ynthesis with memory.",
+                options: {
+                    R: 'start',
+                    C: 'temporal_breach',
+                    S: 'memory_synthesis'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
+            memory_synthesis: {
+                text: "You integrate the memory's knowledge with your own consciousness.",
+                description: "Your understanding of reality expands exponentially. (R)eturn to fragment exploration.",
+                options: {
+                    R: 'deeper_fragment'
+                },
+                onVisit: function() {
+                    game.increaseInsight(4);
+                }
+            },
             temporal_breach: {
                 text: "Time unravels like gossamer threads.",
-                description: "Moments collide and separate. (S)tep through the breach, (B)ack to void.",
+                description: "Moments collide and separate. (S)tep through the breach, (B)ack to void, (O)bserve the time flows.",
                 options: {
                     S: 'timeless_nexus',
-                    B: 'start'
+                    B: 'start',
+                    O: 'time_observation'
                 },
                 challenge: {
                     type: 'wisdom',
@@ -278,20 +561,50 @@
                     failure: 'temporal_dissonance'
                 }
             },
+            time_observation: {
+                text: "You watch as moments from all of history flow around you.",
+                description: "Patterns emerge in the chaos of time. (F)ocus on a specific flow, (R)eturn to breach.",
+                options: {
+                    F: 'time_pattern',
+                    R: 'temporal_breach'
+                }
+            },
+            time_pattern: {
+                text: "You discover that time flows in fractal patterns that repeat at cosmic scales.",
+                description: "This insight reveals how to navigate the flows safely. (R)eturn to the temporal breach.",
+                options: {
+                    R: 'temporal_breach'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
+                }
+            },
             temporal_dissonance: {
                 text: "Temporal energies threaten to tear you apart.",
-                description: "(R)eturn to void, (T)ry again.",
+                description: "(R)eturn to void, (T)ry again, (H)armonize with the flows.",
                 options: {
                     R: 'start',
-                    T: 'temporal_breach'
+                    T: 'temporal_breach',
+                    H: 'temporal_harmony'
+                }
+            },
+            temporal_harmony: {
+                text: "You align your consciousness with the natural rhythm of time.",
+                description: "The dissonance fades as you learn to flow with time rather than against it. (R)eturn to breach.",
+                options: {
+                    R: 'temporal_breach'
+                },
+                onVisit: function() {
+                    game.increaseInsight(3);
                 }
             },
             timeless_nexus: {
                 text: "Past, present, and future coexist in a single point.",
-                description: "Infinite possibilities breathe around you. Requires ultimate Insight. (M)editate, (B)ack to breach.",
+                description: "Infinite possibilities breathe around you. Requires ultimate Insight. (M)editate, (B)ack to breach, (E)xplore paradoxes.",
                 options: {
                     M: 'reality_splice',
-                    B: 'temporal_breach'
+                    B: 'temporal_breach',
+                    E: 'paradox_exploration'
                 },
                 challenge: {
                     type: 'insight',
@@ -300,26 +613,73 @@
                     failure: 'nexus_rejection'
                 }
             },
+            paradox_exploration: {
+                text: "You examine points where causality loops back on itself.",
+                description: "The nature of these paradoxes reveals keys to transcendence. (R)eturn to nexus.",
+                options: {
+                    R: 'timeless_nexus'
+                },
+                onVisit: function() {
+                    game.increaseInsight(4);
+                }
+            },
             nexus_rejection: {
                 text: "The nexus rejects your incomplete consciousness.",
-                description: "(R)eturn to void, (T)ry again.",
+                description: "(R)eturn to void, (T)ry again, (D)eepen your understanding.",
                 options: {
                     R: 'start',
-                    T: 'timeless_nexus'
+                    T: 'timeless_nexus',
+                    D: 'nexus_contemplation'
+                }
+            },
+            nexus_contemplation: {
+                text: "You contemplate the interconnectedness of all moments in time.",
+                description: "Your perspective expands beyond linear causality. (R)eturn to timeless nexus.",
+                options: {
+                    R: 'timeless_nexus'
+                },
+                onVisit: function() {
+                    game.increaseInsight(5);
                 }
             },
             reality_splice: {
                 text: "You become the point of convergence.",
-                description: "Ultimate transcendence awaits. (E)mbrace your destiny.",
+                description: "Ultimate transcendence awaits. (E)mbrace your destiny, (O)bserve the multiverse once more.",
+                options: {
+                    E: 'final_revelation',
+                    O: 'cosmic_vista'
+                }
+            },
+            cosmic_vista: {
+                text: "All of existence spreads before you like an infinite tapestry.",
+                description: "You see the patterns that bind all realities together. (E)mbrace transcendence.",
                 options: {
                     E: 'final_revelation'
+                },
+                onVisit: function() {
+                    game.increaseInsight(5);
                 }
             },
             final_revelation: {
                 text: "The multiverse unfolds within your consciousness.",
-                description: "Congratulations! You have transcended all limitations. (R)estart your journey.",
+                description: "Congratulations! You have transcended all limitations. (R)estart your journey or (A)scend beyond.",
+                options: {
+                    R: 'start',
+                    A: 'true_transcendence'
+                }
+            },
+            true_transcendence: {
+                text: "You have become one with the infinite realm.",
+                description: "Your consciousness expands to embrace all of existence and beyond. This is merely the beginning of your true journey. (R)eturn to start a new cycle.",
                 options: {
                     R: 'start'
+                },
+                onVisit: function() {
+                    // Special ending effect
+                    document.body.classList.add('glow');
+                    setTimeout(() => {
+                        document.body.classList.remove('glow');
+                    }, 5000);
                 }
             }
         });
@@ -329,19 +689,42 @@
             currentScene: 'start',
             insight: 0,
             maxVisitedScenes: new Set(),
+            history: [],
+            
             resetStats() {
                 this.insight = 0;
                 this.maxVisitedScenes.clear();
+                this.history = [];
             },
+            
             increaseInsight(amount) {
                 this.insight += amount;
                 this.updateStatus();
             },
+            
             updateStatus() {
                 const statusEl = document.getElementById('status');
-                statusEl.textContent = `Insight: ${this.insight}`;
+                statusEl.innerHTML = `<div>Insight: ${this.insight}</div>`;
+                
+                // Show available key commands for current scene
+                const controlsEl = document.getElementById('controls');
+                const sceneData = this.scenes[this.currentScene];
+                const options = typeof sceneData.options === 'function' ? sceneData.options() : sceneData.options;
+                
+                let optionsText = "Available actions: ";
+                for (const [key, value] of Object.entries(options)) {
+                    optionsText += `<span class="glow">${key}</span> `;
+                }
+                controlsEl.innerHTML = optionsText;
             },
+            
             display() {
+                const gameEl = document.getElementById('game');
+                gameEl.classList.remove('fade-in');
+                
+                // Force a reflow to restart the animation
+                void gameEl.offsetWidth;
+                
                 const sceneData = this.scenes[this.currentScene];
                 const sceneText = typeof sceneData.text === 'function' 
                     ? sceneData.text() 
@@ -350,8 +733,9 @@
                     ? sceneData.description()
                     : sceneData.description;
                 
-                document.getElementById('game').innerHTML = `
-                    <div>${sceneText}</div>
+                gameEl.classList.add('fade-in');
+                gameEl.innerHTML = `
+                    <div class="glow">${sceneText}</div>
                     <div>${sceneDescription}</div>
                 `;
                 
@@ -370,37 +754,67 @@
                 
                 this.updateStatus();
             },
+            
             move(input) {
+                const upperInput = input.toUpperCase();
                 const currentScene = this.scenes[this.currentScene];
                 const currentOptions = typeof currentScene.options === 'function' 
                     ? currentScene.options() 
                     : currentScene.options;
                 
+                // Check if input is valid for current scene
+                if (!currentOptions[upperInput]) {
+                    return; // Invalid input, do nothing
+                }
+                
                 // Check for challenges
                 if (currentScene.challenge) {
                     const challenge = currentScene.challenge;
-                    const requirementMet = challenge.type === 'wisdom' 
-                        ? true  // Wisdom is always available
-                        : challenge.type === 'insight' && this.insight >= challenge.difficulty;
+                    let success = true;
                     
-                    if (!requirementMet) {
-                        // If challenge requirement is not met, stay in current scene
-                        return;
+                    if (challenge.type === 'insight') {
+                        success = this.insight >= challenge.difficulty;
                     }
+                    
+                    // Store previous scene for "back" functionality
+                    this.history.push(this.currentScene);
+                    
+                    // Navigate based on challenge result
+                    if (success) {
+                        this.currentScene = currentOptions[upperInput];
+                    } else {
+                        this.currentScene = challenge.failure;
+                    }
+                    
+                    this.display();
+                    return;
                 }
                 
-                if (currentOptions[input.toUpperCase()]) {
-                    this.currentScene = currentOptions[input.toUpperCase()];
-                    this.display();
+                // Store current scene for "back" functionality before changing it
+                if (upperInput !== 'B') { // Don't store if we're going back
+                    this.history.push(this.currentScene);
                 }
+                
+                // Handle "Back" functionality specially
+                if (upperInput === 'B' && this.history.length > 0) {
+                    this.currentScene = currentOptions[upperInput];
+                } else {
+                    this.currentScene = currentOptions[upperInput];
+                }
+                
+                this.display();
             },
+            
             init() {
                 this.scenes = createGameScenes(this);
                 this.display();
+                
                 document.addEventListener('keydown', (e) => {
-                    const validKeys = ['n', 'e', 's', 'w', 'b', 'r', 't', 'c', 'd', 'p', 'm', 'u', 'f', 'o'];
-                    if (validKeys.includes(e.key.toLowerCase())) {
-                        this.move(e.key);
+                    const key = e.key.toLowerCase();
+                    // Expanded list of valid keys
+                    const validKeys = ['n', 'e', 's', 'w', 'b', 'r', 't', 'c', 'd', 'p', 'm', 'u', 'f', 'o', 'a', 'l', 'h'];
+                    if (validKeys.includes(key)) {
+                        this.move(key);
                     }
                 });
             }
