@@ -24,7 +24,7 @@ Echoes of the Infinite Realm is an immersive text-based adventure game that take
 - **JavaScript**: Game logic and interactivity
 
 ## Usage
-To play the game, simply open the `index.html` file in your web browser. Use your keyboard to navigate through the game by pressing the keys mentioned in the text.
+To play the game, simply visit https://bettercallmilan.github.io/EOTIR. Use your keyboard to navigate through the game by pressing the keys mentioned in the text.
 
 ## License
 This project is open-source and available under the [MIT License](LICENSE).
