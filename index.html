@@ -629,7 +629,6 @@
                     R: 'start'
                 },
                 onVisit: function() {
-                    // Special ending effect
                     document.body.classList.add('glow');
                     setTimeout(() => {
                         document.body.classList.remove('glow');
@@ -660,7 +659,6 @@
                 const statusEl = document.getElementById('status');
                 statusEl.innerHTML = `<div>Insight: ${this.insight}</div>`;
                 
-                // Show available key commands for current scene
                 const controlsEl = document.getElementById('controls');
                 const sceneData = this.scenes[this.currentScene];
                 const options = typeof sceneData.options === 'function' ? sceneData.options() : sceneData.options;
@@ -676,7 +674,6 @@
                 const gameEl = document.getElementById('game');
                 gameEl.classList.remove('fade-in');
                 
-                // Force a reflow to restart the animation
                 void gameEl.offsetWidth;
                 
                 const sceneData = this.scenes[this.currentScene];
@@ -693,15 +690,12 @@
                     <div>${sceneDescription}</div>
                 `;
                 
-                // Track visited scenes
                 this.maxVisitedScenes.add(this.currentScene);
                 
-                // Initialize scene if it has an init function
                 if (sceneData.init) {
                     sceneData.init();
                 }
                 
-                // Run onVisit function if it exists
                 if (sceneData.onVisit) {
                     sceneData.onVisit();
                 }
@@ -716,12 +710,10 @@
                     ? currentScene.options() 
                     : currentScene.options;
                 
-                // Check if input is valid for current scene
                 if (!currentOptions[upperInput]) {
-                    return; // Invalid input, do nothing
+                    return;
                 }
                 
-                // Check for challenges
                 if (currentScene.challenge) {
                     const challenge = currentScene.challenge;
                     let success = true;
@@ -730,10 +722,8 @@
                         success = this.insight >= challenge.difficulty;
                     }
                     
-                    // Store previous scene for "back" functionality
                     this.history.push(this.currentScene);
                     
-                    // Navigate based on challenge result
                     if (success) {
                         this.currentScene = currentOptions[upperInput];
                     } else {
@@ -744,12 +734,10 @@
                     return;
                 }
                 
-                // Store current scene for "back" functionality before changing it
-                if (upperInput !== 'B') { // Don't store if we're going back
+                if (upperInput !== 'B') {
                     this.history.push(this.currentScene);
                 }
                 
-                // Handle "Back" functionality specially
                 if (upperInput === 'B' && this.history.length > 0) {
                     this.currentScene = currentOptions[upperInput];
                 } else {
@@ -765,7 +753,6 @@
                 
                 document.addEventListener('keydown', (e) => {
                     const key = e.key.toLowerCase();
-                    // Expanded list of valid keys
                     const validKeys = ['n', 'e', 's', 'w', 'b', 'r', 't', 'c', 'd', 'p', 'm', 'u', 'f', 'o', 'a', 'l', 'h'];
                     if (validKeys.includes(key)) {
                         this.move(key);
@@ -775,6 +762,7 @@
         };
 
         game.init();
+        
     </script>
 </body>
 </html>
