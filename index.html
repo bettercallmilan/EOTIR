@@ -27,10 +27,6 @@
                     E: 'echo_caverns',
                     S: 'spectral_mists',
                     W: 'temporal_breach'
-                },
-                init: function() {
-                    if (game.history.length === 0) {
-                        game.resetStats();
                 }
             },
             shadow_realm: {
@@ -644,6 +640,7 @@
             insight: 0,
             maxVisitedScenes: new Set(),
             history: [],
+            firstLoad: true,
             
             resetStats() {
                 this.insight = 0;
@@ -692,6 +689,11 @@
                 `;
                 
                 this.maxVisitedScenes.add(this.currentScene);
+
+                if (this.firstLoad && this.currentScene === 'start') {
+                    this.resetStats();
+                    this.firstLoad = false;
+                }
                 
                 if (sceneData.init) {
                     sceneData.init();
