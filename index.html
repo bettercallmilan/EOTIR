@@ -29,7 +29,8 @@
                     W: 'temporal_breach'
                 },
                 init: function() {
-                    game.resetStats();
+                    if (game.history.length === 0) {
+                        game.resetStats();
                 }
             },
             shadow_realm: {
