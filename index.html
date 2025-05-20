@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Echoes of the Infinite Realm</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -16,6 +17,7 @@
 <body>
     <div id="game" class="fade-in"></div>
     <div id="controls"></div>
+    <div id="touch-controls" class="touch-controls"></div>
     <div id="status"></div>
     <script>
         const createGameScenes = (game) => ({
@@ -641,15 +643,21 @@
             maxVisitedScenes: new Set(),
             history: [],
             firstLoad: true,
+            insightCalculations: new Map(),
             
             resetStats() {
                 this.insight = 0;
                 this.maxVisitedScenes.clear();
                 this.history = [];
+                this.insightCalculations.clear();
             },
             
             increaseInsight(amount) {
-                this.insight += amount;
+                const sceneKey = this.currentScene;
+                if (!this.insightCalculations.has(sceneKey)) {
+                    this.insight += amount;
+                    this.insightCalculations.set(sceneKey, amount);
+                }
                 this.updateStatus();
             },
             
@@ -666,6 +674,31 @@
                     optionsText += `<span class="glow">${key}</span> `;
                 }
                 controlsEl.innerHTML = optionsText;
+
+                this.updateTouchControls(options);
+            },
+
+            updateTouchControls(options) {
+                const touchControlsEl = document.getElementById('touch-controls');
+                touchControlsEl.innerHTML = '';
+                
+                for (const [key, value] of Object.entries(options)) {
+                    const button = document.createElement('button');
+                    button.className = 'touch-button';
+                    button.innerText = key;
+                    button.setAttribute('data-key', key);
+                    
+                    button.addEventListener('click', (e) => {
+                        e.target.classList.add('button-pressed');
+                        
+                        setTimeout(() => {
+                            this.move(key);
+                            e.target.classList.remove('button-pressed');
+                        }, 150);
+                    });
+                    
+                    touchControlsEl.appendChild(button);
+                }
             },
             
             display() {
@@ -716,6 +749,16 @@
                 if (!currentOptions[upperInput]) {
                     return;
                 }
+
+                // Add button pressed animation feedback
+                const targetKey = input.toUpperCase();
+                const keyElement = document.querySelector(`button[data-key="${targetKey}"]`);
+                if (keyElement) {
+                    keyElement.classList.add('button-pressed');
+                    setTimeout(() => {
+                        keyElement.classList.remove('button-pressed');
+                    }, 150);
+                }
                 
                 if (currentScene.challenge) {
                     const challenge = currentScene.challenge;
@@ -758,6 +801,13 @@
                     const key = e.key.toLowerCase();
                     const validKeys = ['n', 'e', 's', 'w', 'b', 'r', 't', 'c', 'd', 'p', 'm', 'u', 'f', 'o', 'a', 'l', 'h'];
                     if (validKeys.includes(key)) {
+                        const keyElement = document.querySelector(`button[data-key="${key.toUpperCase()}"]`);
+                        if (keyElement) {
+                            keyElement.classList.add('button-pressed');
+                            setTimeout(() => {
+                                keyElement.classList.remove('button-pressed');
+                            }, 150);
+                        }
                         this.move(key);
                     }
                 });
